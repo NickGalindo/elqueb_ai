@@ -12,3 +12,4 @@ data/
 pyrightconfig.json
 data/
 config.yaml
+*volumes/
