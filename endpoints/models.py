@@ -9,8 +9,8 @@ class Oferta(BaseModel):
 
 class SemanticSearchTerms(BaseModel):
     search_term: str
-    category: str | None
-    region: str | None
+    category: str | None = None
+    region: str | None = None
 
 class OfertasHistory(BaseModel):
     history: List[str]

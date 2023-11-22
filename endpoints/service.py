@@ -1,8 +1,8 @@
 from typing import Dict, List
+from endpoints.models import OfertasHistory
 
 from manager.load_config import CONFIG
 
-import re
 import numpy as np
 
 from pymilvus import Collection 
@@ -120,3 +120,29 @@ def semanticSearch(search_term: str, category: str | None, region: str | None, c
             search_res.add(entity.id)
 
     return list(search_res)
+
+def recommendOfertas(history: OfertasHistory, col: Collection, model: SentenceTransformer):
+    search_params: Dict = {"metric_type": "L2", "params": {"nprobe": 10}}
+
+    embeddings: List = []
+
+    for i in history.history:
+        oferta_embedding = transform(i, model).flatten().tolist()
+        embeddings.append(oferta_embedding)
+
+    for _ in range(CONFIG["BOUNCINESS"]):
+        embeddings.append(np.random.uniform(low=-2.0, high=2.0, size=1024))
+
+    res = col.search(
+        data=embeddings,
+        anns_field="oferta",
+        param=search_params,
+        limit=5
+    )
+
+    recommendations = set()
+    for aux in res: #type: ignore
+        for entity in aux:
+            recommendations.add(entity.id)
+
+    return [i for i in np.random.choice(list(recommendations), size=min(5, len(recommendations)), replace=False).tolist()]

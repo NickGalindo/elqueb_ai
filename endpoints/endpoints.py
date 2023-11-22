@@ -35,5 +35,5 @@ async def semanticSearch(request: Request, search_terms: SemanticSearchTerms) ->
     return res
 
 @router.post("/recommendOfertas")
-async def recommendOfertas(request: Request, history: OfertasHistory):
-    pass
+async def recommendOfertas(request: Request, history: OfertasHistory) -> List:
+    return service.recommendOfertas(history, request.app.state.ofertasCollection, request.app.state.transformerModel)
